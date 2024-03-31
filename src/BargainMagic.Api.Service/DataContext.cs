@@ -6,7 +6,9 @@ namespace BargainMagic.Api.Service
 {
     public class DataContext : DbContext
     {
+        public DbSet<Card> Cards { get; set; }
         public DbSet<Season> Seasons { get; set; }
+        public DbSet<SeasonCardComposite> SeasonCardComposites { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -23,7 +25,27 @@ namespace BargainMagic.Api.Service
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Season>().ToTable("Season");
+            modelBuilder.Entity<Card>()
+                        .ToTable("Card")
+                        .HasKey(e => e.Id);
+
+            modelBuilder.Entity<Season>()
+                        .ToTable("Season")
+                        .HasKey(e => e.Id);
+
+            modelBuilder.Entity<SeasonCardComposite>(entity =>
+            {
+                entity.ToTable("SeasonCardComposite");
+                entity.HasKey(e => new { e.SeasonId, e.CardId });
+
+                entity.HasOne(e => e.Season)
+                      .WithOne()
+                      .HasPrincipalKey<Season>(e => e.Id);
+
+                entity.HasOne(e => e.Card)
+                      .WithOne()
+                      .HasPrincipalKey<Card>(e => e.Id);
+            });
         }
     }
 }

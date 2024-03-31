@@ -25,8 +25,22 @@ namespace BargainMagic.Api.Service.Controllers
                          {
                              Name = "TestSeason"
                          };
-
             dataContext.Seasons.Add(season);
+
+            var card = new Card
+                       {
+                           Name = "Omniscience"
+                       };
+            dataContext.Cards.Add(card);
+
+            var composite = new SeasonCardComposite
+                            {
+                                Season = season,
+                                Card = card,
+                                RawCost = 673
+                            };
+            dataContext.SeasonCardComposites.Add(composite);
+
             dataContext.SaveChanges();
 
             return Ok();
