@@ -4,6 +4,8 @@ using BargainMagic.Api.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddDbContextFactory<DataContext>();
 
 builder.Services.AddSingleton<CardFetcherChannel>();
