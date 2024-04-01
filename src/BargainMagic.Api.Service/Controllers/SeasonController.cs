@@ -1,4 +1,6 @@
-﻿using BargainMagic.Api.Service.Entities;
+﻿using BargainMagic.Api.Service.Channels;
+using BargainMagic.Api.Service.Commands;
+using BargainMagic.Api.Service.Entities;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,11 +11,14 @@ namespace BargainMagic.Api.Service.Controllers
     [ApiController]
     public class SeasonController : ControllerBase
     {
-        private IDbContextFactory<DataContext> dataContextFactory;
+        private readonly IDbContextFactory<DataContext> dataContextFactory;
+        private readonly CardFetcherChannel cardFetcherChannel;
 
-        public SeasonController(IDbContextFactory<DataContext> dataContextFactory)
+        public SeasonController(IDbContextFactory<DataContext> dataContextFactory,
+                                CardFetcherChannel cardFetcherChannel)
         {
             this.dataContextFactory = dataContextFactory ?? throw new ArgumentNullException(nameof(dataContextFactory));
+            this.cardFetcherChannel = cardFetcherChannel ?? throw new ArgumentNullException(nameof(cardFetcherChannel));
         }
 
         [HttpPost]
@@ -27,21 +32,10 @@ namespace BargainMagic.Api.Service.Controllers
                          };
             dataContext.Seasons.Add(season);
 
-            var card = new Card
-                       {
-                           Name = "Omniscience"
-                       };
-            dataContext.Cards.Add(card);
-
-            var composite = new SeasonCardComposite
-                            {
-                                Season = season,
-                                Card = card,
-                                RawCost = 673
-                            };
-            dataContext.SeasonCardComposites.Add(composite);
-
             dataContext.SaveChanges();
+
+            var cardFetchCommand = new CardFetchCommand();
+            cardFetcherChannel.Writer.TryWrite(cardFetchCommand);
 
             return Ok();
         }
