@@ -39,12 +39,12 @@ namespace BargainMagic.Api.Service
                 entity.HasKey(e => new { e.SeasonId, e.CardId });
 
                 entity.HasOne(e => e.Season)
-                      .WithOne()
-                      .HasPrincipalKey<Season>(e => e.Id);
+                      .WithMany()
+                      .HasForeignKey(e => e.SeasonId);
 
                 entity.HasOne(e => e.Card)
-                      .WithOne()
-                      .HasPrincipalKey<Card>(e => e.Id);
+                      .WithMany()
+                      .HasForeignKey(e => e.CardId);
             });
         }
     }
