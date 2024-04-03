@@ -1,5 +1,6 @@
 using BargainMagic.Api.Service;
 using BargainMagic.Api.Service.Channels;
+using BargainMagic.Api.Service.Repositories;
 using BargainMagic.Api.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpClient();
 
 builder.Services.AddDbContextFactory<DataContext>();
+
+builder.Services.AddSingleton<CardRepository>();
+
+builder.Services.AddSingleton<CardFetcherChannel>();
 
 builder.Services.AddSingleton<CardFetcherChannel>();
 
