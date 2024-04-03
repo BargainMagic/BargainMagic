@@ -121,20 +121,9 @@ namespace BargainMagic.Api.Service.Services
 
                     var rawMinimumPrice = priceList.Min() * 100;
 
-                    Console.WriteLine($"Adding Card [{cardModelGroup.Name} : {cardId}] with price [{rawMinimumPrice}]");
-                    /*
-                    var seasonCardComposite = new SeasonCardComposite
-                                              {
-                                                  Season = season,
-                                                  SeasonId = season.Id,
-                                                  Card = card,
-                                                  CardId = card.Id,
-                                                  RawCost = (int)rawMinimumPrice
-                                              };
-                    dataContext.SeasonCardComposites.Add(seasonCardComposite);
-                    
-                    await dataContext.SaveChangesAsync();
-                    */
+                    await cardRepository.InsertSeasonCardCompositeAsync(seasonId: season.Id,
+                                                                        cardId: cardId,
+                                                                        rawCost: (int)rawMinimumPrice);
                 }
             }
         }

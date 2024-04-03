@@ -34,5 +34,31 @@ namespace BargainMagic.Api.Service.Repositories
 
             return card.Id;
         }
+    
+        public async Task InsertSeasonCardCompositeAsync(int seasonId,
+                                                         int cardId,
+                                                         int rawCost)
+        {
+            using var dataContext = dataContextFactory.CreateDbContext();
+
+            var seasonCardComposite = dataContext.SeasonCardComposites.FirstOrDefault(scc => scc.SeasonId == seasonId
+                                                                                          && scc.CardId == cardId);
+
+            if (seasonCardComposite != null)
+            {
+                return;
+            }
+
+            seasonCardComposite = new SeasonCardComposite
+                                  {
+                                      SeasonId = seasonId,
+                                      CardId = cardId,
+                                      RawCost = rawCost
+                                  };
+
+            dataContext.SeasonCardComposites.Add(seasonCardComposite);
+
+            await dataContext.SaveChangesAsync();
+        }
     }
 }
