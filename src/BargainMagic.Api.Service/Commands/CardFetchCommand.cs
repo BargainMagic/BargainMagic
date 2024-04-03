@@ -2,5 +2,6 @@
 {
     public class CardFetchCommand
     {
+        public int SeasonId { get; set; }
     }
 }

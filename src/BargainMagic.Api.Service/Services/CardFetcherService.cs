@@ -18,14 +18,17 @@ namespace BargainMagic.Api.Service.Services
         private readonly CardFetcherChannel cardFetcherChannel;
         private readonly CardRepository cardRepository;
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly SeasonRepository seasonRepository;
 
         public CardFetcherService(CardFetcherChannel cardFetchChannel,
                                   CardRepository cardRepository,
-                                  IHttpClientFactory httpClientFactory)
+                                  IHttpClientFactory httpClientFactory,
+                                  SeasonRepository seasonRepository)
         {
             this.cardFetcherChannel = cardFetchChannel ?? throw new ArgumentNullException(nameof(cardFetchChannel));
             this.cardRepository = cardRepository ?? throw new ArgumentNullException(nameof(cardRepository));
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            this.seasonRepository = seasonRepository ?? throw new ArgumentNullException(nameof(seasonRepository));
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -65,6 +68,13 @@ namespace BargainMagic.Api.Service.Services
                                                        PriceModels = prices.ToList()
                                                    })
                                           .ToList();
+
+                var season = await seasonRepository.GetSeason(cardFetchCommmand.SeasonId);
+
+                if (season == null)
+                {
+                    continue;
+                }
 
                 foreach (var cardModelGroup in groupedCardModels)
                 {

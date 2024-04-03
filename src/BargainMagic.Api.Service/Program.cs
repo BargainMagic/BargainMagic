@@ -10,6 +10,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddDbContextFactory<DataContext>();
 
 builder.Services.AddSingleton<CardRepository>();
+builder.Services.AddSingleton<SeasonRepository>();
 
 builder.Services.AddSingleton<CardFetcherChannel>();
 
