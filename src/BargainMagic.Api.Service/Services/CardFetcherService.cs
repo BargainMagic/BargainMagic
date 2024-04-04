@@ -3,6 +3,7 @@ using BargainMagic.Api.Service.Models;
 using BargainMagic.Api.Service.Repositories;
 
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace BargainMagic.Api.Service.Services
 {
@@ -50,6 +51,7 @@ namespace BargainMagic.Api.Service.Services
                     PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
                 };
 
+
                 var deserializedCardModels =
                     JsonSerializer.Deserialize<List<ScryfallCardModel>>(json: cardDataJsonString,
                                                                         options: serializerOptions);
@@ -59,15 +61,35 @@ namespace BargainMagic.Api.Service.Services
                     continue;
                 }
 
+                const string TypeLineRegex = "Token|Basic";
+
+                var filteredCardModels = new List<ScryfallCardModel>();
+                
+                foreach (var cardModel in deserializedCardModels)
+                {
+                    if (cardModel.TypeLine == null ||
+                        Regex.Match(cardModel.TypeLine, TypeLineRegex).Success)
+                    {
+                        continue;
+                    }
+                    
+                    filteredCardModels.Add(cardModel);
+                }
+
+                /*
+                var filteredCardModels =
+                    deserializedCardModels.Where(c => c.TypeLine == null ||
+                                                 !Regex.Match(c.TypeLine, TypeLineRegex).Success);
+                */
                 var groupedCardModels =
-                    deserializedCardModels.GroupBy(c => c.Name,
-                                                   c => c.Prices,
-                                                   (name, prices) => new
-                                                   {
-                                                       Name = name,
-                                                       PriceModels = prices.ToList()
-                                                   })
-                                          .ToList();
+                    filteredCardModels.GroupBy(c => c.Name,
+                                               c => c.Prices,
+                                               (name, prices) => new
+                                               {
+                                                   Name = name,
+                                                   PriceModels = prices.ToList()
+                                               })
+                                      .ToList();
 
                 var season = await seasonRepository.GetSeason(cardFetchCommmand.SeasonId);
 
@@ -125,7 +147,7 @@ namespace BargainMagic.Api.Service.Services
                                                                         cardId: cardId,
                                                                         rawCost: (int)rawMinimumPrice);
                 }
-            }
+             }
         }
 
         public async Task<string> GetCardDataAsync()
