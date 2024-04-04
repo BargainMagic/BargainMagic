@@ -51,7 +51,6 @@ namespace BargainMagic.Api.Service.Services
                     PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
                 };
 
-
                 var deserializedCardModels =
                     JsonSerializer.Deserialize<List<ScryfallCardModel>>(json: cardDataJsonString,
                                                                         options: serializerOptions);
@@ -61,12 +60,29 @@ namespace BargainMagic.Api.Service.Services
                     continue;
                 }
 
+                const string ReversableCardLayout = "reversible_card";
                 const string TypeLineRegex = "Token|Basic";
 
                 var filteredCardModels = new List<ScryfallCardModel>();
                 
                 foreach (var cardModel in deserializedCardModels)
                 {
+                    if (cardModel.Layout == ReversableCardLayout &&
+                        cardModel.CardFaces != null)
+                    {
+                        var frontCardFace = cardModel.CardFaces.FirstOrDefault();
+
+                        if (frontCardFace != null)
+                        {
+                            cardModel.Name = frontCardFace.Name;
+                            cardModel.TypeLine = frontCardFace.TypeLine;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
                     if (cardModel.TypeLine == null ||
                         Regex.Match(cardModel.TypeLine, TypeLineRegex).Success)
                     {
