@@ -60,6 +60,7 @@ namespace BargainMagic.Api.Service.Services
                     continue;
                 }
 
+                const string NotLegal = "not_legal";
                 const string ReversableCardLayout = "reversible_card";
                 const string TypeLineRegex = "Token|Basic";
 
@@ -85,6 +86,12 @@ namespace BargainMagic.Api.Service.Services
 
                     if (cardModel.TypeLine == null ||
                         Regex.Match(cardModel.TypeLine, TypeLineRegex).Success)
+                    {
+                        continue;
+                    }
+
+                    if (cardModel.Legalities == null ||
+                        cardModel.Legalities.All(l => l.Value == NotLegal))
                     {
                         continue;
                     }
