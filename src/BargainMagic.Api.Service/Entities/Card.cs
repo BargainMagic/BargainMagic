@@ -1,14 +1,14 @@
 ﻿namespace BargainMagic.Api.Service.Entities
 {
-    public class Season
+    public class Card
     {
         /// <summary>
-        /// The unique identifier of the Season.
+        /// The unique identifier of the Card.
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// The human readible identifier of the Season.
+        /// The human readible identifier of the Card.
         /// </summary>
         public string? Name { get; set; }
     }

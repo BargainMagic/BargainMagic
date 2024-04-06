@@ -1,7 +1,8 @@
-﻿using BargainMagic.Api.Service.Entities;
+﻿using BargainMagic.Api.Service.Channels;
+using BargainMagic.Api.Service.Commands;
+using BargainMagic.Api.Service.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BargainMagic.Api.Service.Controllers
 {
@@ -9,25 +10,27 @@ namespace BargainMagic.Api.Service.Controllers
     [ApiController]
     public class SeasonController : ControllerBase
     {
-        private IDbContextFactory<DataContext> dataContextFactory;
+        private readonly CardFetcherChannel cardFetcherChannel;
+        private readonly SeasonRepository seasonRepository;
 
-        public SeasonController(IDbContextFactory<DataContext> dataContextFactory)
+        public SeasonController(CardFetcherChannel cardFetcherChannel,
+                                SeasonRepository seasonRepository)
         {
-            this.dataContextFactory = dataContextFactory ?? throw new ArgumentNullException(nameof(dataContextFactory));
+            this.cardFetcherChannel = cardFetcherChannel ?? throw new ArgumentNullException(nameof(cardFetcherChannel));
+            this.seasonRepository = seasonRepository ?? throw new ArgumentNullException(nameof(seasonRepository));
         }
 
         [HttpPost]
-        public ActionResult Create()
+        public async Task<ActionResult> Create(string seasonName)
         {
-            using var dataContext = dataContextFactory.CreateDbContext();
+            var seasonId = await seasonRepository.InsertSeason(seasonName);
 
-            var season = new Season
-                         {
-                             Name = "TestSeason"
-                         };
+            var cardFetchCommand = new CardFetchCommand
+                                   {
+                                       SeasonId = seasonId
+                                   };
 
-            dataContext.Seasons.Add(season);
-            dataContext.SaveChanges();
+            cardFetcherChannel.Writer.TryWrite(cardFetchCommand);
 
             return Ok();
         }
