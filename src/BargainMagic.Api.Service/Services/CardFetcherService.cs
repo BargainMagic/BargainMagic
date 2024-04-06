@@ -99,11 +99,6 @@ namespace BargainMagic.Api.Service.Services
                     filteredCardModels.Add(cardModel);
                 }
 
-                /*
-                var filteredCardModels =
-                    deserializedCardModels.Where(c => c.TypeLine == null ||
-                                                 !Regex.Match(c.TypeLine, TypeLineRegex).Success);
-                */
                 var groupedCardModels =
                     filteredCardModels.GroupBy(c => c.Name,
                                                c => c.Prices,
